@@ -14,7 +14,30 @@ services:
     restart: always
     ports:
       - "6379:6379"
-  
+
+  discountdb:
+    container_name: discountdb
+    restart: always
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin1234
+      - POSTGRES_DB=DiscontDb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  pgadmin:
+    container_name: pgadmin
+    restart: always
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=sid@tamu.edu
+      - PGADMIN_DEFAULT_PASSWORD=admin1234
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/root/.pgadmin
+
   portainer:
     container_name: portainer
     ports:
@@ -33,7 +56,6 @@ services:
       - "8000:80"
     depends_on:
       - catalogdb
-
     # volumes:
     #   - ~/.aspnet/https:/root/.aspnet/https:ro
     #   - ~/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
@@ -47,7 +69,6 @@ services:
       - "CacheSettings:ConnectionString=basketdb:6379"
     ports:
       - "8001:80"
-
     # volumes:
     #   - ~/.aspnet/https:/root/.aspnet/https:ro
     #   - ~/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
