@@ -2,6 +2,7 @@ using Discount.Grpc.Extensions;
 using Discount.Grpc.Mapper;
 using Discount.Grpc.Repositories;
 using Discount.Grpc.Services;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,11 +12,17 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddGrpc();
 
-var app = builder.Build();
-
 builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
 builder.Services.AddAutoMapper(typeof(DiscountProfile));
 
+// MAC https://go.microsoft.com/fwlink/?linkid=2099682
+builder.Services.Configure<KestrelServerOptions>(options =>
+{
+  options.ListenAnyIP(80, o => o.Protocols = HttpProtocols.Http2);
+});
+
+
+var app = builder.Build();
 app.MigrateDatabase<Program>(retry: 5);
 
 // Configure the HTTP request pipeline.
