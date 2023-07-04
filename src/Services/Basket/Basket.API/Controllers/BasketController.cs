@@ -31,7 +31,7 @@ namespace Basket.API.Controllers
     [ProducesResponseType(typeof(ShoppingCart), (int)HttpStatusCode.OK)]
     public async Task<ActionResult<ShoppingCart>> UpdateBasket([FromBody] ShoppingCart basket)
     {
-      // TODO : Communicate with Discount.Grpc
+
       // Calculate latest prices of product into shopping cart
       // consume Discount Grpc (not directly from here, but encapsulate it into Basket.Grpc)
 
@@ -50,6 +50,29 @@ namespace Basket.API.Controllers
     {
       await _repository.DeleteBasket(userName);
       return Ok();
+    }
+
+    [Route("[action]")]
+    [HttpPost]
+    [ProducesResponseType(typeof(void), (int)HttpStatusCode.Accepted)]
+    [ProducesResponseType(typeof(void), (int)HttpStatusCode.BadRequest)]
+    public async Task<IActionResult> Checkout([FromBody] BasketCheckout basketCheckout)
+    {
+      // get existing basket with total price
+      var basket = await _repository.GetBasket(basketCheckout.UserName);
+      if (basket == null)
+      {
+        return BadRequest();
+      }
+
+      // Create basketCheckoutEvent -- Set TotalPrice on basketCheckout eventMessage
+
+      // send checkout event to rabbitmq
+
+      // remove the basket
+      await _repository.DeleteBasket(basket.UserName);
+
+      return Accepted();
     }
 
   }
