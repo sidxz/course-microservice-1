@@ -27,6 +27,15 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  orderdb:
+    container_name: orderdb
+    restart: always
+    environment:
+      - SA_PASSWORD=SwN12345678
+      - ACCEPT_EULA=Y
+    ports:
+      - "1433:1433"
+
   pgadmin:
     container_name: pgadmin
     restart: always
@@ -82,7 +91,6 @@ services:
       - "DatabaseSettings:ConnectionString=Host=discountdb;Port=5432;Database=DiscountDb;Username=admin;Password=admin1234"
     ports:
       - "8002:80"
-    
     #volumes:
     #  - ~/.aspnet/https:/root/.aspnet/https:ro
     #  - ~/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
@@ -94,4 +102,3 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
     ports:
       - "8003:80"
-
