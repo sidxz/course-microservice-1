@@ -1,4 +1,5 @@
 using Basket.API.GrpcService;
+using Basket.API.Mapper;
 using Basket.API.Repositories;
 using Discount.Grpc.Protos;
 using MassTransit;
@@ -7,12 +8,16 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+
+
 // Add Redis cache
 builder.Services.AddStackExchangeRedisCache(options =>
 {
   options.Configuration = builder.Configuration.GetValue<string>("CacheSettings:ConnectionString");
 });
 
+// General Configuration
+builder.Services.AddAutoMapper(typeof(BasketProfile));
 builder.Services.AddScoped<IBasketRepository, BasketRepository>();
 
 

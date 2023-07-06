@@ -87,6 +87,7 @@ services:
       #- ASPNETCORE_URLS=https://+:443;http://+:80
       - "CacheSettings:ConnectionString=basketdb:6379"
       - "GrpcSettings:DiscountUrl=http://discount.grpc"
+      - "EventBusSettings:HostAddress=amqp://guest:guest@rabbitmq:5672/"
     ports:
       - "8001:80"
     # volumes:
