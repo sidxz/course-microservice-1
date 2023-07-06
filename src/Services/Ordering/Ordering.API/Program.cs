@@ -1,4 +1,8 @@
+using EventBus.Messages.Common;
+using MassTransit;
+using Ordering.API.EventBusConsumer;
 using Ordering.API.Extensions;
+using Ordering.API.Mapping;
 using Ordering.Application;
 using Ordering.Infrastructure;
 using Ordering.Infrastructure.Persistence;
@@ -16,8 +20,28 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureService(builder.Configuration);
 
-var app = builder.Build();
+// MassTransit-RabbitMQ Configuration
+// And join as a consumer subscriber to the BasketCheckoutQueue
+builder.Services.AddMassTransit(config =>
+{
+  config.AddConsumer<BasketCheckoutConsumer>();
+  config.UsingRabbitMq((ctx, cfg) =>
+  {
+    cfg.Host(builder.Configuration["EventBusSettings:HostAddress"]);
+    cfg.ReceiveEndpoint(EventBusConstants.BasketCheckoutQueue, c =>
+    {
+      c.ConfigureConsumer<BasketCheckoutConsumer>(ctx);
+    });
+  });
+});
 
+//Add automapper
+builder.Services.AddAutoMapper(typeof(OrderingProfile));
+
+// Add the consumer as a scoped service so it can be injected into the controller
+builder.Services.AddScoped<BasketCheckoutConsumer>();
+
+var app = builder.Build();
 
 
 // Configure the HTTP request pipeline.

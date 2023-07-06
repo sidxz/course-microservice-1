@@ -15,6 +15,9 @@ builder.Services.AddGrpc();
 builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
 builder.Services.AddAutoMapper(typeof(DiscountProfile));
 
+AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2Support", true);
+
 // MAC https://go.microsoft.com/fwlink/?linkid=2099682
 builder.Services.Configure<KestrelServerOptions>(options =>
 {

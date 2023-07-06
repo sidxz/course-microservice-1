@@ -1,3 +1,4 @@
+using System.Net.Security;
 using Basket.API.GrpcService;
 using Basket.API.Mapper;
 using Basket.API.Repositories;
@@ -21,10 +22,29 @@ builder.Services.AddAutoMapper(typeof(BasketProfile));
 builder.Services.AddScoped<IBasketRepository, BasketRepository>();
 
 
+// Add the following code to explicitly allow HTTP/2 without TLS
+AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2Support", true);
+
 // Grpc Configuration
-builder.Services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>
-    (o => o.Address = new Uri(builder.Configuration["GrpcSettings:DiscountUrl"]));
+builder.Services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>(o =>
+{
+    o.Address = new Uri(builder.Configuration["GrpcSettings:DiscountUrl"]);
+}).ConfigureChannel(options =>
+{
+    options.HttpHandler = new SocketsHttpHandler
+    {
+        SslOptions = new SslClientAuthenticationOptions
+        {
+            RemoteCertificateValidationCallback = delegate { return true; } // Optional: Allow untrusted certificates
+        }
+    };
+});
+
+
+
 builder.Services.AddScoped<DiscountGrpcService>();
+
 
 // MassTransit-RabbitMQ Configuration
 builder.Services.AddMassTransit(config =>

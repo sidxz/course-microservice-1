@@ -90,6 +90,9 @@ services:
       - "EventBusSettings:HostAddress=amqp://guest:guest@rabbitmq:5672/"
     ports:
       - "8001:80"
+    depends_on:
+      - basketdb
+      - rabbitmq
     # volumes:
     #   - ~/.aspnet/https:/root/.aspnet/https:ro
     #   - ~/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
@@ -100,8 +103,12 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       #- ASPNETCORE_URLS=https://+:443;http://+:80
       - "DatabaseSettings:ConnectionString=Host=discountdb;Port=5432;Database=DiscountDb;Username=admin;Password=admin1234"
+      
     ports:
       - "8002:80"
+    depends_on:
+      - discountdb
+      
     #volumes:
     #  - ~/.aspnet/https:/root/.aspnet/https:ro
     #  - ~/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
@@ -118,10 +125,12 @@ services:
     container_name: ordering.api
     environment:
       - "ConnectionStrings:OrderingConnectionString=Server=orderdb;Database=OrderDb;User Id=sa;Password=SwN12345678;TrustServerCertificate=True;"
+      - "EventBusSettings:HostAddress=amqp://guest:guest@rabbitmq:5672/"
       - ASPNETCORE_ENVIRONMENT=Development
       # - ASPNETCORE_URLS=https://+:443;http://+:80
     depends_on:
       - orderdb
+      - rabbitmq
     ports:
       - "8004:80"
     # volumes:
