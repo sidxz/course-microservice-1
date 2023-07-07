@@ -103,12 +103,11 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       #- ASPNETCORE_URLS=https://+:443;http://+:80
       - "DatabaseSettings:ConnectionString=Host=discountdb;Port=5432;Database=DiscountDb;Username=admin;Password=admin1234"
-      
+
     ports:
       - "8002:80"
     depends_on:
       - discountdb
-      
     #volumes:
     #  - ~/.aspnet/https:/root/.aspnet/https:ro
     #  - ~/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
@@ -133,7 +132,7 @@ services:
       - rabbitmq
     ports:
       - "8004:80"
-    # volumes:
+      # volumes:
       # - ~/.aspnet/https:/root/.aspnet/https:ro
       # - ~/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
 
@@ -153,3 +152,18 @@ services:
     # volumes:
     #   - ~/.aspnet/https:/root/.aspnet/https:ro
     #   - ~/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
+
+  shopping.aggregator:
+    container_name: shopping.aggregator
+    depends_on:
+      - catalog.api
+      - basket.api
+      - ordering.api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "ApiSettings:CatalogUrl=http://catalog.api"
+      - "ApiSettings:BasketUrl=http://basket.api"
+      - "ApiSettings:DiscountUrl=http://discount.api"
+      - "ApiSettings:OrderingUrl=http://ordering.api"
+    ports:
+      - "8005:80"
